@@ -4,16 +4,17 @@ import android.support.annotation.IdRes;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
+import com.example.maxim.filefinder.fragments.ListFragment;
+import com.example.maxim.filefinder.fragments.SearchFragment;
+import com.example.maxim.filefinder.fragments.SettingsFragment;
 import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.OnTabReselectListener;
 import com.roughike.bottombar.OnTabSelectListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String LOG = "log";
+    final String LOG_TAG = "myLogs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,20 +26,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 if (tabId == R.id.listItem) {
-                    // The tab with id R.id.tab_favorites was selected,
-                    // change your content accordingly.
-                    Toast.makeText(getApplicationContext(), "LIST", Toast.LENGTH_SHORT).show();
-                    Log.d(LOG, String.valueOf(R.id.listItem));
+                    Log.d(LOG_TAG, String.valueOf(R.id.listItem));
+                    ListFragment listFragment = new ListFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, listFragment).commit();
                 } else if (tabId == R.id.searchItem) {
-                    Toast.makeText(getApplicationContext(), "SEARCH", Toast.LENGTH_SHORT).show();
-                    Log.d(LOG, String.valueOf(R.id.searchItem));
+                    Log.d(LOG_TAG, String.valueOf(R.id.searchItem));
+                    SearchFragment searchFragment = new SearchFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, searchFragment).commit();
                 } else if (tabId == R.id.settingsItem) {
-                    Toast.makeText(getApplicationContext(), "SETTINGS", Toast.LENGTH_SHORT).show();
-                    Log.d(LOG, String.valueOf(R.id.searchItem));
+                    Log.d(LOG_TAG, String.valueOf(R.id.searchItem));
+                    SettingsFragment settingsFragment = new SettingsFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, settingsFragment).commit();
                 } else {
-                    Log.d(LOG,"MENU ERROR");
+                    Log.d(LOG_TAG,"MENU ERROR");
                 }
-                Log.d(LOG, String.valueOf(tabId));
+                Log.d(LOG_TAG, String.valueOf(tabId));
             }
         });
 
