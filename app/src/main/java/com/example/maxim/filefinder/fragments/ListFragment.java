@@ -54,9 +54,9 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
         rv.setHasFixedSize(true);
         //-----------------------------------------------
         fullPath = (TextView) v.findViewById(R.id.fullPath);
-        root = Environment.getExternalStorageDirectory().getPath();
+        root = Environment.getRootDirectory().getPath();
         //-----------------------------------------------
-        initializeData(root);
+        initializeData("/");
         initializeAdapter();
 
         return v;
@@ -70,7 +70,8 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
         path = new ArrayList<String>();
         File f = new File(dirPath);
         File[] files = f.listFiles();
-
+        //adding "UP" element
+        items.add(0, new ItemFileExplorer(dirPath, "UP folder", R.drawable.ic_content_reply, false, true));
         if(!dirPath.equals(root))
         {
             item.add(root);
@@ -79,74 +80,71 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
             path.add(f.getParent());
         }
 
-        for(int i=0; i < files.length; i++)
+        for(int i = 0; i < files.length; i++)
         {
             File file = files[i];
 
             if(!file.isHidden() && file.canRead()){
                 path.add(file.getPath());
                 if(file.isDirectory()){
-                    items.add(new ItemFileExplorer(file.getName() + "/", "500bytes folder", R.drawable.ic_action_settings, false));
+                    items.add(1, new ItemFileExplorer(file.getName() + "/", "500bytes folder", R.drawable.ic_file_folder, false, true));
                 } else {
-                    items.add(new ItemFileExplorer(file.getName(), "500bytes file",R.drawable.ic_action_search, false));
+                    items.add(new ItemFileExplorer(file.getName(), "500bytes file",R.drawable.ic_action_description, false, false));
                 }
             }
         }
+        Log.d(LOG_TAG, "ITEMS - " + items.size());
+
+
     }
 
     private void initializeAdapter(){
         RVAdapter adapter = new RVAdapter(items, getContext());
         adapter.setClickListener(this);
         rv.setAdapter(adapter);
-
-    }
-
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "ListFragment onActivityCreated");
-    }
-
-    public void onStart() {
-        super.onStart();
-        Log.d(LOG_TAG, "ListFragment onStart");
-    }
-
-    public void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "ListFragment onResume");
-    }
-
-    public void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "ListFragment onPause");
-    }
-
-    public void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG, "ListFragment onStop");
-    }
-
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(LOG_TAG, "ListFragment onDestroyView");
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "ListFragment onDestroy");
-    }
-
-    public void onDetach() {
-        super.onDetach();
-        Log.d(LOG_TAG, "ListFragment onDetach");
     }
 
     @Override
     public void itemClick(View view, int position) {
-        Log.d(LOG_TAG, position + "" + view.toString());
-        Log.d(LOG_TAG, position + " Is cheked - " + view.findViewById(R.id.is_selected_cb).toString());
-        RecyclerView.ViewHolder b = (RVAdapter.ViewHolder)rv.findViewHolderForAdapterPosition(position);
-        Log.d(LOG_TAG, position + " ");
+        if (items.get(position).isFolder){
+            if (position == 0 && !root.equals("/")) {
+                if (!root.equals("/system")){
+                    Log.d(LOG_TAG, "ROOT2 " + root + " " + root.length());
+                    Log.d(LOG_TAG, "FOLDER2 " + items.get(position).name );
+                    root = root.substring(0, root.length()-1);
+                    while (root.charAt(root.length()-1) != "/".charAt(0)){
+                        root = root.substring(0, root.length()-1);
+                    }
+                    items.clear();
+                    Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
+                    initializeData(root);
+                    rv.removeAllViews();
+                    RVAdapter adapter = new RVAdapter(items, getContext());
+                    adapter.setClickListener(this);
+                    rv.setAdapter(adapter);
+                }
+            } else {
+                Log.d(LOG_TAG, "ROOT " + root + " " + root.length());
+                Log.d(LOG_TAG, "FOLDER " + items.get(position).name );
+                if (root.equals("/system")){
+                    root = "/"+items.get(position).name;
+                } else {
+                    root += items.get(position).name;
 
+                }
+                items.clear();
+                Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
+                initializeData(root);
+                rv.removeAllViews();
+                RVAdapter adapter = new RVAdapter(items, getContext());
+                adapter.setClickListener(this);
+                rv.setAdapter(adapter);
+            }
+        } else {
+            Log.d(LOG_TAG, "JUST FILE " + items.get(position).name);
+        }
     }
+
+
+
 }
