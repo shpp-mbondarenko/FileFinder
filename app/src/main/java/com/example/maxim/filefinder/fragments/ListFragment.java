@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.maxim.filefinder.R;
@@ -32,16 +31,21 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
     private List<String> path = null;
     private String root;
     private TextView fullPath;
+    boolean[] checked;
+    ArrayList<String> searchFolders;
+    sendSearchFolders folders;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(LOG_TAG, "ListFragment onAttach");
+        folders = (ListFragment.sendSearchFolders) activity;
     }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "ListFragment onCreate");
+        searchFolders = new ArrayList<String>();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,7 +62,6 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
         //-----------------------------------------------
         initializeData("/");
         initializeAdapter();
-
         return v;
     }
 
@@ -72,18 +75,9 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
         File[] files = f.listFiles();
         //adding "UP" element
         items.add(0, new ItemFileExplorer(dirPath, "UP folder", R.drawable.ic_content_reply, false, true));
-        if(!dirPath.equals(root))
-        {
-            item.add(root);
-            path.add(root);
-            item.add("../");
-            path.add(f.getParent());
-        }
 
-        for(int i = 0; i < files.length; i++)
-        {
+        for(int i = 0; i < files.length; i++) {
             File file = files[i];
-
             if(!file.isHidden() && file.canRead()){
                 path.add(file.getPath());
                 if(file.isDirectory()){
@@ -94,8 +88,6 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
             }
         }
         Log.d(LOG_TAG, "ITEMS - " + items.size());
-
-
     }
 
     private void initializeAdapter(){
@@ -119,9 +111,7 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
                     Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
                     initializeData(root);
                     rv.removeAllViews();
-                    RVAdapter adapter = new RVAdapter(items, getContext());
-                    adapter.setClickListener(this);
-                    rv.setAdapter(adapter);
+                   initializeAdapter();
                 }
             } else {
                 Log.d(LOG_TAG, "ROOT " + root + " " + root.length());
@@ -136,15 +126,67 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
                 Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
                 initializeData(root);
                 rv.removeAllViews();
-                RVAdapter adapter = new RVAdapter(items, getContext());
-                adapter.setClickListener(this);
-                rv.setAdapter(adapter);
+                initializeAdapter();
             }
         } else {
             Log.d(LOG_TAG, "JUST FILE " + items.get(position).name);
         }
     }
 
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(LOG_TAG, "ListFragment onActivityCreated");
+    }
 
+    public void onStart() {
+        super.onStart();
+        Log.d(LOG_TAG, "ListFragment onStart");
+    }
 
+    public void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG, "ListFragment onResume");
+    }
+
+    public void onPause() {
+        super.onPause();
+        Log.d(LOG_TAG, "ListFragment onPause");
+    }
+
+    public void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "ListFragment onStop");
+        checked = RVAdapter.getChecked();
+        for (int i = 1; i < checked.length; i++) {
+            boolean b = checked[i];
+            Log.d(LOG_TAG, "CHECKED - " + b);
+            if (b) {
+                searchFolders.add(root + "/" + items.get(i).name);
+            }
+        }
+        for (String t : searchFolders){
+            Log.d(LOG_TAG, t );
+        }
+      folders.setSearchFolders(searchFolders);
+
+    }
+
+    public interface sendSearchFolders {
+       void setSearchFolders(ArrayList<String> searchFolders);
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(LOG_TAG, "ListFragment onDestroyView");
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "ListFragment onDestroy");
+    }
+
+    public void onDetach() {
+        super.onDetach();
+        Log.d(LOG_TAG, "ListFragment onDetach");
+    }
 }

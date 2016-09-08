@@ -7,8 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.example.maxim.filefinder.MainActivity;
 import com.example.maxim.filefinder.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by Maxim on 04.09.2016.
@@ -16,6 +21,8 @@ import com.example.maxim.filefinder.R;
 public class SearchFragment extends Fragment {
 
     final String LOG_TAG = "myLogs";
+    private ListView listView;
+    private ArrayList<String> folders;
 
     @Override
     public void onAttach(Activity activity) {
@@ -28,10 +35,22 @@ public class SearchFragment extends Fragment {
         Log.d(LOG_TAG, "SearchFragment onCreate");
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(LOG_TAG, "SearchFragment onCreateView");
+        MainActivity activity = (MainActivity) getActivity();
+        folders = activity.searchFolders;
+
+        for (int i = 0; i < folders.size(); i++) {
+            Log.d(LOG_TAG, "SEARCH " + folders.get(i));
+        }
+
         View v = inflater.inflate(R.layout.activity_search, null);
+        listView = (ListView) v.findViewById(R.id.lv_search_folders);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, folders);
+        // Assign adapter to ListView
+        listView.setAdapter(adapter);
+
         return v;
     }
 

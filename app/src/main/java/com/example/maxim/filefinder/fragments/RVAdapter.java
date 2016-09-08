@@ -24,11 +24,37 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
     Context context;
     List<ItemFileExplorer> itemFileExplorerList;
     private ClickListener clickListener;
+    static boolean[] checked;
 
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    RVAdapter(List<ItemFileExplorer> items, Context context){
+        public TextView tvName;
+        public TextView tvDescription;
+        public ImageView ivFileIcon;
+        public CheckBox cbSelected;
+        private Context context;
+
+        public ViewHolder(View itemView, Context context) {
+            super(itemView);
+            this.context = context;
+            itemView.setOnClickListener(this);
+            tvName = (TextView) itemView.findViewById(R.id.item_name);
+            tvDescription = (TextView) itemView.findViewById(R.id.item_description);
+            ivFileIcon = (ImageView) itemView.findViewById(R.id.file_image);
+            cbSelected = (CheckBox) itemView.findViewById(R.id.is_selected_cb);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (clickListener != null)
+                clickListener.itemClick(v, getPosition());
+        }
+    }
+
+    public RVAdapter(List<ItemFileExplorer> items, Context context){
         this.itemFileExplorerList = items;
         this.context = context;
+        checked = new boolean[itemFileExplorerList.size()];
     }
 
     @Override
@@ -44,11 +70,17 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder itemViewHolder, int i) {
-        itemViewHolder.ivFileIcon.setImageResource(itemFileExplorerList.get(i).icon);
-        itemViewHolder.tvName.setText(itemFileExplorerList.get(i).name);
-        itemViewHolder.tvDescription.setText(itemFileExplorerList.get(i).description);
-        itemViewHolder.cbSelected.setChecked(itemFileExplorerList.get(i).isCheckedCB);
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        holder.ivFileIcon.setImageResource(itemFileExplorerList.get(position).icon);
+        holder.tvName.setText(itemFileExplorerList.get(position).name);
+        holder.tvDescription.setText(itemFileExplorerList.get(position).description);
+        holder.cbSelected.setChecked(itemFileExplorerList.get(position).isCheckedCB);
+        holder.cbSelected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checked[position] = !checked[position];
+            }
+        });
     }
 
     @Override
@@ -56,43 +88,15 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
         return itemFileExplorerList.size();
     }
 
-    public CheckBox getCheckBox(int pos) {
-        return null;
+    public static boolean[] getChecked() {
+        return checked;
     }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView tvName;
-        public TextView  tvDescription;
-        public ImageView ivFileIcon;
-        public CheckBox cbSelected;
-        private Context context;
-
-
-        public ViewHolder(View itemView, Context context) {
-            super(itemView);
-            this.context  = context;
-            itemView.setOnClickListener(this);
-            tvName = (TextView)itemView.findViewById(R.id.item_name);
-            tvDescription = (TextView)itemView.findViewById(R.id.item_description);
-            ivFileIcon = (ImageView)itemView.findViewById(R.id.file_image);
-            cbSelected = (CheckBox)itemView.findViewById(R.id.is_selected_cb);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (clickListener != null)
-                clickListener.itemClick(v, getPosition());
-        }
-
-    }
-
 
     public void setClickListener(ClickListener clickListener){
         this.clickListener = clickListener;
     }
 
     public  interface ClickListener{
-        public void itemClick(View view, int position);
+        void itemClick(View view, int position);
     }
 }

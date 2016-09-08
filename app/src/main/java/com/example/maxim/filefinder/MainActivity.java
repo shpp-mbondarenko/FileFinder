@@ -12,14 +12,25 @@ import com.example.maxim.filefinder.fragments.SettingsFragment;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements ListFragment.sendSearchFolders {
 
     final String LOG_TAG = "myLogs";
+    public ArrayList<String> searchFolders;
+
+    public void setSearchFolders(ArrayList<String> searchFolders) {
+        this.searchFolders = searchFolders;
+        for (int i = 0; i < searchFolders.size(); i++) {
+            Log.d(LOG_TAG, "ACTIVITY " + searchFolders.get(i));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        searchFolders = new ArrayList<String>();
 
         BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
