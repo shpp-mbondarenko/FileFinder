@@ -8,12 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.maxim.filefinder.MainActivity;
 import com.example.maxim.filefinder.R;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by Maxim on 04.09.2016.
@@ -23,6 +27,7 @@ public class SearchFragment extends Fragment {
     final String LOG_TAG = "myLogs";
     private ListView listView;
     private ArrayList<String> folders;
+    private Button btnSearch;
 
     @Override
     public void onAttach(Activity activity) {
@@ -40,18 +45,46 @@ public class SearchFragment extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         folders = activity.searchFolders;
 
-        for (int i = 0; i < folders.size(); i++) {
-            Log.d(LOG_TAG, "SEARCH " + folders.get(i));
-        }
-
         View v = inflater.inflate(R.layout.activity_search, null);
         listView = (ListView) v.findViewById(R.id.lv_search_folders);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, folders);
-        // Assign adapter to ListView
         listView.setAdapter(adapter);
 
+        btnSearch = (Button) v.findViewById(R.id.btn_start_search);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "Button click in Fragment2");
+                searchFiles(folders);
+            }
+        });
         return v;
+    }
+
+
+    public void searchFiles(ArrayList<String> folders){
+        Queue<String> queue = new LinkedList<>();
+        for (String str : folders) {
+            queue.add(str);
+        }
+        Log.d(LOG_TAG, "queue -  " + queue.size());
+        //----------------------------------------------
+        String root;
+        File[] files;
+        while (!queue.isEmpty()) {
+            File f = new File(queue.poll());
+            root = f.getName();
+            Log.d(LOG_TAG, "ROOT Queue -  " + root);
+            files = f.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                if (file.isDirectory()){
+                    queue.add(root + "/" + file.getName());
+                } else {
+                    Log.d(LOG_TAG, "FILE LENGHT -  " + file.length());
+                }
+            }
+        }
     }
 
     public void onActivityCreated(Bundle savedInstanceState) {

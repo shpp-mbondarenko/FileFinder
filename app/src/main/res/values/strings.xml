@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">FileFinder</string>
     <string name="confirm_selected_folders">Confirm selected folders</string>
+    <string name="enter_quantity_search_files">Enter quantity search files:</string>
 </resources>

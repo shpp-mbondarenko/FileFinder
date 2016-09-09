@@ -111,7 +111,7 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
                     Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
                     initializeData(root);
                     rv.removeAllViews();
-                   initializeAdapter();
+                    initializeAdapter();
                 }
             } else {
                 Log.d(LOG_TAG, "ROOT " + root + " " + root.length());
@@ -161,18 +161,21 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
             boolean b = checked[i];
             Log.d(LOG_TAG, "CHECKED - " + b);
             if (b) {
-                searchFolders.add(root + "/" + items.get(i).name);
+                if (root.charAt(root.length()-1) == "/".charAt(0)){
+                    searchFolders.add(root + items.get(i).name);
+                } else {
+                    searchFolders.add(root + "/" + items.get(i).name);}
             }
         }
         for (String t : searchFolders){
             Log.d(LOG_TAG, t );
         }
-      folders.setSearchFolders(searchFolders);
+        folders.setSearchFolders(searchFolders);
 
     }
 
     public interface sendSearchFolders {
-       void setSearchFolders(ArrayList<String> searchFolders);
+        void setSearchFolders(ArrayList<String> searchFolders);
     }
 
     public void onDestroyView() {
