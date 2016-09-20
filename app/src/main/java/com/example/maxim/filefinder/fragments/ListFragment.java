@@ -83,7 +83,7 @@ public class ListFragment extends Fragment implements RVAdapter.ClickListener{
                 if(file.isDirectory()){
                     items.add(1, new ItemFileExplorer(file.getName() + "/", "500bytes folder", R.drawable.ic_file_folder, false, true));
                 } else {
-                    items.add(new ItemFileExplorer(file.getName(), "500bytes file",R.drawable.ic_action_description, false, false));
+                    items.add(new ItemFileExplorer(file.getName(), file.length()+" bytes", R.drawable.ic_action_description, false, false));
                 }
             }
         }

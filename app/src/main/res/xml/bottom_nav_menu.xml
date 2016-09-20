@@ -11,8 +11,8 @@
         title="Search"
         barColorWhenSelected="@color/menuItem2"/>
     <tab
-        id="@+id/settingsItem"
+        id="@+id/searchResult"
         icon="@drawable/ic_action_settings"
-        title="Settings"
+        title="Search results"
         barColorWhenSelected="@color/menuItem3"/>
 </tabs>
