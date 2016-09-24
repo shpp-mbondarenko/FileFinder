@@ -87,6 +87,7 @@ public class ExplorerDialogFragment extends DialogFragment implements View.OnCli
         adapter.setClickListener(this);
         rv.setAdapter(adapter);
     }
+
     @Override
     public void onClick(View v) {
         Log.d(LOG_TAG, "Dialog 1: " + ((Button) v).getText());
@@ -97,8 +98,10 @@ public class ExplorerDialogFragment extends DialogFragment implements View.OnCli
             if (b) {
                 if (root.charAt(root.length()-1) == "/".charAt(0)){
                     searchFolders.add(root + items.get(i).name);
+                    Log.d("KUKU1", root + items.get(i).name);
                 } else {
-                    searchFolders.add(root + "/" + items.get(i).name);
+                    searchFolders.add("/" + items.get(i).name);
+                    Log.d("KUKU2 ", root + "/" + items.get(i).name);
                 }
             }
         }
@@ -131,7 +134,7 @@ public class ExplorerDialogFragment extends DialogFragment implements View.OnCli
                         root = root.substring(0, root.length()-1);
                     }
                     items.clear();
-                    Log.d(LOG_TAG, "ROOT AFTER " + root + " " + root.length());
+                    Log.d(LOG_TAG, "ROOT AFTER2 " + root + " " + root.length());
                     initializeData(root);
                     rv.removeAllViews();
                     initializeAdapter();

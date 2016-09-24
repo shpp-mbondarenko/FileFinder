@@ -13,7 +13,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, ExplorerDialogFragment.sendSearchFolders{
-    private static final String ARRAY = "array";
+    private final String QUANTITY_OF_FILES = "quantity";
+    private final String ARRAY = "array";
+    private final String ROOT = "/sdcard/Music/";
     final String LOG_TAG = "myLogs";
     private ListView listView;
     private ArrayList<String> folders;
@@ -30,10 +32,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         Log.d(LOG_TAG,"OnCreate");
         folders = new ArrayList<String>();
         searchFolders = new ArrayList<String>();
-        folders.add("/");
+        folders.add(ROOT);
         listView = (ListView) findViewById(R.id.lv_search_folders);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, folders);
+                R.layout.row_layout, R.id.tv_list_item, folders);
         listView.setAdapter(adapter);
 
         btnSearch = (Button) findViewById(R.id.btn_start_search);
@@ -52,9 +54,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 dialogFragment.show(getFragmentManager(), "exp");
                 break;
             case R.id.btn_start_search:
+                int num = 1;
+                try {
+                    num = Integer.parseInt(etFilesQuantity.getText().toString());
+                } catch(NumberFormatException nfe) {
+                    Log.d(LOG_TAG, "Could not parse" + nfe);
+                }
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(ARRAY, folders);
                 Intent i = new Intent(getApplicationContext(), SearchService.class);
+                i.putExtra(QUANTITY_OF_FILES, num);
                 i.putExtra(ARRAY, bundle);
                 startService(i);
                 break;
@@ -70,14 +79,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         if (folders.size() != 0) {
             folders = searchFolders;
         }
-//        else {
-//            folders.add("/");
-//        }
         for (int i =0; i < folders.size(); i++){
             Log.d(LOG_TAG,"folders - " + folders.get(i));
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, folders);
+                R.layout.row_layout, R.id.tv_list_item, folders);
         listView.setAdapter(adapter);
     }
 }
