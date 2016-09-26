@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="5dp"
-    android:paddingBottom="1dp"
-    android:paddingTop="1dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
@@ -11,18 +8,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_name"
         android:text="Directory"
-        android:textSize="15sp"
-        android:layout_alignTop="@+id/is_selected_cb"
+        android:textSize="@dimen/file_system_text_size"
+        android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/file_image"
-        android:layout_toEndOf="@+id/file_image" />
+        android:layout_toEndOf="@+id/file_image"
+        android:paddingBottom="-1dp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_description"
+        android:textSize="@dimen/file_system_text_size"
         android:text="Description"
-        android:layout_alignBottom="@+id/is_selected_cb"
-        android:layout_alignLeft="@+id/item_name"
-        android:layout_alignStart="@+id/item_name" />
+        android:layout_below="@+id/item_name"
+        android:layout_toRightOf="@+id/file_image"
+        android:layout_toEndOf="@+id/file_image"
+        android:paddingBottom="1dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -37,6 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/file_image"
+        android:background="@drawable/ic_action_description"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />

@@ -75,7 +75,7 @@ public class ExplorerDialogFragment extends DialogFragment implements View.OnCli
                 if(file.isDirectory()){
                     items.add(1, new ItemFileExplorer(file.getName() + "/", "500bytes folder", R.drawable.ic_file_folder, false, true));
                 } else {
-                    items.add(new ItemFileExplorer(file.getName(), file.length()+" bytes", R.drawable.ic_action_description, false, false));
+                    items.add(new ItemFileExplorer(file.getName(), file.length() + " bytes", R.drawable.ic_action_description, false, false));
                 }
             }
         }
@@ -111,6 +111,7 @@ public class ExplorerDialogFragment extends DialogFragment implements View.OnCli
         folders.setSearchFolders(searchFolders);
         dismiss();
     }
+
 
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);

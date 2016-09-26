@@ -1,6 +1,7 @@
 package com.example.filefinder;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,9 +16,13 @@ import android.util.Log;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Created by Maxim on 19.09.2016.
@@ -26,15 +31,21 @@ public class SearchService extends Service {
 
     private final String QUANTITY_OF_FILES = "quantity";
     private final String ARRAY = "array";
+    private final String FILE_SIZES = "fileSizes";
+    private final String FILE_PATH = "filePath";
     private final String ROOT = "ROOT/...";
     final String LOG_TAG = "myLogs";
 
-    private Queue<Long> bestFiles;
+    private long[] fileSizes;
+    private String[] filePath;
+    private Queue<Long> queueSizeOfFindFiles;
+    private Map<Long,String> resultMap;
     Comparator<Long> comparator;
 
     private ArrayList<String> folders;
     private int filesToFind;
     Context context;
+    Set<String> nn;
 
     @Override
     public void onCreate() {
@@ -42,7 +53,9 @@ public class SearchService extends Service {
         Log.d(LOG_TAG, "onCreate");
         folders = new ArrayList<>();
         comparator = new LongComparator();
-        bestFiles = new PriorityQueue<>();
+        queueSizeOfFindFiles = new PriorityQueue<>();
+        resultMap = new HashMap<>();
+        nn = new HashSet<>();
     }
 
     @Override
@@ -58,11 +71,6 @@ public class SearchService extends Service {
                 stopSelf();
             }
         }).start();
-
-
-//            createNotification(56, R.drawable.ic_action_view_list, "Searching files...", "files checked - " + i);
-
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -74,7 +82,7 @@ public class SearchService extends Service {
     public void searchFiles(ArrayList<String> folders, int numOfFindFiles){
         Queue<String> queue = new LinkedList<>();
         for (int i =0; i < folders.size(); i++){
-           queue.add(folders.get(i));
+            queue.add(folders.get(i));
         }
         int counter = 0;
         Log.d(LOG_TAG, "queue -  " + queue.size());
@@ -90,45 +98,54 @@ public class SearchService extends Service {
 //                Log.d(LOG_TAG, "files list -  " + files.length);
                 for (int i = 0; i < files.length; i++) {
                     counter++;
-                    if (counter%500 == 0) {
+                    if (counter % 500 == 0) {
                         createNotification(56, R.drawable.ic_action_view_list, "Searching files...", "More than files checked - " + counter, false);
                     }
                     File file = files[i];
-                    if (file.isDirectory()) {
+                    if (file.isDirectory() && !file.isHidden()) {
 //                        Log.d(LOG_TAG, "ISDIReCTORY " + root + file.getName() + "/");
                         queue.add(root + file.getName() + "/");
                     } else {
 //                        Log.d(LOG_TAG, "FILE LENGHT -  " + file.length() + " " + root + file.getName());
-                        if (file.length() != 0) {
-                            bestFiles.add(file.length());
-                        }                   }
+                        if (file.length() != 0 && !file.isHidden()) {
+                            queueSizeOfFindFiles.add(file.length());
+                            resultMap.put(file.length(), root + file.getName());
+                            if (nn.contains(root + file.getName())){
+                                Log.d(LOG_TAG, "TAKAYA EST" + root + file.getName() + "/");
+                                stopSelf();
+                            } else {
+                                nn.add(root + file.getName());
+                                Log.d(LOG_TAG, "Netttttt" + root + file.getName() + "/");
+                            }
+                        }
+                    }
                 }
             }
         }
         Log.d(LOG_TAG, "counter = " + counter);
-        if (filesToFind > bestFiles.size()) {
-            filesToFind = bestFiles.size();
+        if (filesToFind > queueSizeOfFindFiles.size()) {
+            filesToFind = queueSizeOfFindFiles.size();
         }
-        Long[] b = new Long[filesToFind];
-//        filesToFind = bestFiles.size() - filesToFind;
+        fileSizes = new long[filesToFind];
+        filePath = new String[filesToFind];
         int placeInArray = filesToFind;
-        for (int i = bestFiles.size() - 1; i >= 0; --i) {
+        for (int i = queueSizeOfFindFiles.size() - 1; i >= 0; --i) {
             if (i < filesToFind){
-                b[--placeInArray] = bestFiles.poll();
+                fileSizes[--placeInArray] = queueSizeOfFindFiles.poll();
+                filePath[placeInArray] = resultMap.get(fileSizes[placeInArray]);
             } else {
-                bestFiles.remove();
+                queueSizeOfFindFiles.remove();
             }
 
         }
-        for (int i =0; i < b.length; i++) {
-            Log.d(LOG_TAG, "BEST FILES -  " + b[i]);
+        for (int i = 0; i < fileSizes.length; i++) {
+            Log.d(LOG_TAG, "BEST FILES -  " + fileSizes[i]);
         }
         createNotification(1, R.drawable.ic_action_view_list, "Searching done!", "Files checked - " + counter, true);
     }
 
 
-    //  createNotification(56, R.drawable.ic_launcher, "New Message",
-    //      "There is a new message from Bob!");
+    //  createNotification
     private void createNotification(int nId, int iconRes, String title, String body, Boolean sound) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(iconRes)
                 .setContentTitle(title)
@@ -136,7 +153,18 @@ public class SearchService extends Service {
         if (sound) {
             Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             mBuilder.setSound(uri);
+            //add Action
+            Intent intent = new Intent(this, SearchResultActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(FILE_SIZES, fileSizes);
+            bundle.putSerializable(FILE_PATH, filePath);
+            intent.putExtra(ARRAY, bundle);
+            int requestID = (int) System.currentTimeMillis(); //unique requestID to differentiate between various notification with same NotifId
+            int flags = PendingIntent.FLAG_CANCEL_CURRENT; // cancel old intent and create new one
+            PendingIntent pIntent = PendingIntent.getActivity(this, requestID, intent, flags);
+            mBuilder.setContentIntent(pIntent);
         }
+        mBuilder.setAutoCancel(true);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.

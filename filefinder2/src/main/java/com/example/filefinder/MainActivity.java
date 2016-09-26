@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public ArrayList<String> searchFolders;
     ExplorerDialogFragment dialogFragment;
 
+    static boolean active = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,5 +87,17 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
                 R.layout.row_layout, R.id.tv_list_item, folders);
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
     }
 }

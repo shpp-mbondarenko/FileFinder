@@ -69,10 +69,20 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        holder.ivFileIcon.setImageResource(itemFileExplorerList.get(position).icon);
+        holder.ivFileIcon.setBackgroundResource(itemFileExplorerList.get(position).icon);
         holder.tvName.setText(itemFileExplorerList.get(position).name);
         holder.tvDescription.setText(itemFileExplorerList.get(position).description);
         holder.cbSelected.setChecked(itemFileExplorerList.get(position).isCheckedCB);
+        //-----------------------------------
+        //This section decide where is to hide CheckBox
+        if(position != 0 && itemFileExplorerList.get(position).isFolder ) {
+            holder.cbSelected.setVisibility(View.VISIBLE);
+        } else if(position != 0 && !itemFileExplorerList.get(position).isFolder) {
+            holder.cbSelected.setVisibility(View.INVISIBLE);
+        }
+        if (position == 0)
+            holder.cbSelected.setVisibility(View.INVISIBLE);
+        //-----------------------------------
         holder.cbSelected.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
