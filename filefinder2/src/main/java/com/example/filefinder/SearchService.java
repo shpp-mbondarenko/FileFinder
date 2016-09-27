@@ -33,7 +33,7 @@ public class SearchService extends Service {
     private final String ARRAY = "array";
     private final String FILE_SIZES = "fileSizes";
     private final String FILE_PATH = "filePath";
-    private final String ROOT = "ROOT/...";
+    private final String ROOT = "/root";
     final String LOG_TAG = "myLogs";
 
     private long[] fileSizes;
@@ -44,8 +44,6 @@ public class SearchService extends Service {
 
     private ArrayList<String> folders;
     private int filesToFind;
-    Context context;
-    Set<String> nn;
 
     @Override
     public void onCreate() {
@@ -55,7 +53,6 @@ public class SearchService extends Service {
         comparator = new LongComparator();
         queueSizeOfFindFiles = new PriorityQueue<>();
         resultMap = new HashMap<>();
-        nn = new HashSet<>();
     }
 
     @Override
@@ -64,19 +61,20 @@ public class SearchService extends Service {
         Bundle bundle = intent.getBundleExtra(ARRAY);
         folders = bundle.getStringArrayList(ARRAY);
         filesToFind = intent.getIntExtra(QUANTITY_OF_FILES, 3);
-        Log.d(LOG_TAG,"files to find" + filesToFind);
+        Log.d(LOG_TAG,"files to find - " + filesToFind);
         new Thread(new Runnable() {
             public void run() {
-                searchFiles(folders, filesToFind);
+                if (folders.get(0).equals(ROOT)){
+                    folders.clear();
+                    folders.add("/");
+                    searchFiles(folders, filesToFind);
+                } else {
+                    searchFiles(folders, filesToFind);
+                }
                 stopSelf();
             }
         }).start();
         return super.onStartCommand(intent, flags, startId);
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
     }
 
     public void searchFiles(ArrayList<String> folders, int numOfFindFiles){
@@ -85,17 +83,14 @@ public class SearchService extends Service {
             queue.add(folders.get(i));
         }
         int counter = 0;
-        Log.d(LOG_TAG, "queue -  " + queue.size());
         //----------------------------------------------
         while (queue.peek() != null) {
             String root;
             root = queue.peek();
             File f = new File(queue.poll());
             File[] files;
-//            Log.d(LOG_TAG, "ROOT Queue - " + root);
             files = f.listFiles();
             if (files != null) {
-//                Log.d(LOG_TAG, "files list -  " + files.length);
                 for (int i = 0; i < files.length; i++) {
                     counter++;
                     if (counter % 500 == 0) {
@@ -103,47 +98,44 @@ public class SearchService extends Service {
                     }
                     File file = files[i];
                     if (file.isDirectory() && !file.isHidden()) {
-//                        Log.d(LOG_TAG, "ISDIReCTORY " + root + file.getName() + "/");
                         queue.add(root + file.getName() + "/");
                     } else {
-//                        Log.d(LOG_TAG, "FILE LENGHT -  " + file.length() + " " + root + file.getName());
-                        if (file.length() != 0 && !file.isHidden()) {
-                            queueSizeOfFindFiles.add(file.length());
-                            resultMap.put(file.length(), root + file.getName());
-                            if (nn.contains(root + file.getName())){
-                                Log.d(LOG_TAG, "TAKAYA EST" + root + file.getName() + "/");
-                                stopSelf();
-                            } else {
-                                nn.add(root + file.getName());
-                                Log.d(LOG_TAG, "Netttttt" + root + file.getName() + "/");
-                            }
+                        if (file.length() > 0 && !file.isHidden()) {//
+                            putFileToResult(file.length(), root + file.getName());
                         }
                     }
                 }
             }
         }
-        Log.d(LOG_TAG, "counter = " + counter);
-        if (filesToFind > queueSizeOfFindFiles.size()) {
-            filesToFind = queueSizeOfFindFiles.size();
-        }
-        fileSizes = new long[filesToFind];
-        filePath = new String[filesToFind];
-        int placeInArray = filesToFind;
-        for (int i = queueSizeOfFindFiles.size() - 1; i >= 0; --i) {
-            if (i < filesToFind){
-                fileSizes[--placeInArray] = queueSizeOfFindFiles.poll();
-                filePath[placeInArray] = resultMap.get(fileSizes[placeInArray]);
-            } else {
-                queueSizeOfFindFiles.remove();
-            }
-
-        }
-        for (int i = 0; i < fileSizes.length; i++) {
-            Log.d(LOG_TAG, "BEST FILES -  " + fileSizes[i]);
-        }
         createNotification(1, R.drawable.ic_action_view_list, "Searching done!", "Files checked - " + counter, true);
     }
 
+    //function is deciding put file to result or not
+    private void putFileToResult(long length, String s) {
+        if (fileSizes == null && filePath == null) {
+            fileSizes = new long[filesToFind];
+            filePath = new String[filesToFind];
+            Log.d(LOG_TAG, "CREATING ARRAYS");
+        }
+        Log.d(LOG_TAG, "File len - "+length+" File nam - "+s);
+        for (int i = 0; i < fileSizes.length; i++){
+            if (fileSizes[fileSizes.length - 1] > length) {
+                break;
+            }
+            String str = filePath[i];
+            long lng = fileSizes[i];
+            if (fileSizes[i] < length) {
+                fileSizes[i] = length;
+                filePath[i] = s;
+                Log.d(LOG_TAG, "File was put in " + i + " size " + length);
+                if (i < fileSizes.length - 1) {
+                    putFileToResult(lng, str);
+                }
+                break;
+            }
+        }
+        Log.d(LOG_TAG, "function end");
+    }
 
     //  createNotification
     private void createNotification(int nId, int iconRes, String title, String body, Boolean sound) {
@@ -172,6 +164,10 @@ public class SearchService extends Service {
     }
 
 
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }
 
     @Nullable
     @Override
@@ -181,7 +177,6 @@ public class SearchService extends Service {
     }
 
     public class LongComparator implements Comparator<Long> {
-
         @Override
         public int compare(Long first, Long second) {
             return (int) (first - second);

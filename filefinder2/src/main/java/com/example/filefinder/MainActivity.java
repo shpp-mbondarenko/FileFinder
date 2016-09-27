@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, ExplorerDialogFragment.sendSearchFolders{
     private final String QUANTITY_OF_FILES = "quantity";
     private final String ARRAY = "array";
-    private final String ROOT = "/sdcard/Music/";
+    private final String ROOT = "/root";
     final String LOG_TAG = "myLogs";
     private ListView listView;
     private ArrayList<String> folders;
@@ -31,9 +31,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d(LOG_TAG,"OnCreate");
-        folders = new ArrayList<String>();
-        searchFolders = new ArrayList<String>();
+        folders = new ArrayList<>();
+        searchFolders = new ArrayList<>();
         folders.add(ROOT);
         listView = (ListView) findViewById(R.id.lv_search_folders);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 i.putExtra(QUANTITY_OF_FILES, num);
                 i.putExtra(ARRAY, bundle);
                 startService(i);
+                finish();
                 break;
             default:
                 break;
@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     @Override
     public void setSearchFolders(ArrayList<String> searchFolders) {
-        Log.d(LOG_TAG,"etSearchFolders");
         this.searchFolders = searchFolders;
         if (folders.size() != 0) {
             folders = searchFolders;

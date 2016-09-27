@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">File Finder</string>
-    <string name="confirm_selected_folders">Confirm selected folders</string>
-    <string name="enter_quantity_search_files">Enter quantity of search files:</string>
-    <string name="num_of_default_search_files">5</string>
-</resources>

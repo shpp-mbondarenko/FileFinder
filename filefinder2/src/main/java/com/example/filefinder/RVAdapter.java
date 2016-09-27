@@ -30,11 +30,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ViewHolder> {
         public TextView tvDescription;
         public ImageView ivFileIcon;
         public CheckBox cbSelected;
-        private Context context;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.context = context;
             itemView.setOnClickListener(this);
             tvName = (TextView) itemView.findViewById(R.id.item_name);
             tvDescription = (TextView) itemView.findViewById(R.id.item_description);

@@ -1,1 +1,1 @@
-include ':app', ':string', ':filefinder2'
+include ':filefinder2'
