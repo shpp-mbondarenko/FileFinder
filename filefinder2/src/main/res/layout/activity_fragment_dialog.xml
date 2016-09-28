@@ -14,7 +14,13 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="@string/confirm"
-                android:textColor="@color/text_on_green"
+                android:padding="8dp"
+                android:drawablePadding="8dp"
+                android:textAllCaps="true"
+                android:gravity="left|center_vertical"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:drawableLeft="@drawable/ic_action_assignment_turned_in"
                 android:background="@drawable/custom_button"
                 android:layout_weight="1">
             </Button>

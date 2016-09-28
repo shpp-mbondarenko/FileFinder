@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener, ExplorerDialogFragment.sendSearchFolders{
     private final String QUANTITY_OF_FILES = "quantity";
     private final String ARRAY = "array";
-    private final String ROOT = "/root";
+    private final String ROOT = "root/";
     final String LOG_TAG = "myLogs";
     private ListView listView;
     private ArrayList<String> folders;
@@ -77,14 +77,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     @Override
     public void setSearchFolders(ArrayList<String> searchFolders) {
         this.searchFolders = searchFolders;
-        if (folders.size() != 0) {
+        if (searchFolders.size() == 0) {
+        } else {
             folders = searchFolders;
         }
-        for (int i =0; i < folders.size(); i++){
+        for (int i = 0; i < folders.size(); i++){
             Log.d(LOG_TAG,"folders - " + folders.get(i));
+            searchFolders.set(i, folders.get(i).substring(1));
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                R.layout.row_layout, R.id.tv_list_item, folders);
+                R.layout.row_layout, R.id.tv_list_item, searchFolders);
         listView.setAdapter(adapter);
     }
 

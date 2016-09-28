@@ -9,6 +9,6 @@
         android:text="@+id/tv_list_item"
         android:textColor="@color/text_color"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:textSize="20sp" >
+        android:textSize="40sp" >
     </TextView>
 </LinearLayout>

@@ -33,7 +33,7 @@ public class SearchService extends Service {
     private final String ARRAY = "array";
     private final String FILE_SIZES = "fileSizes";
     private final String FILE_PATH = "filePath";
-    private final String ROOT = "/root";
+    private final String ROOT = "root/";
     final String LOG_TAG = "myLogs";
 
     private long[] fileSizes;
@@ -94,7 +94,7 @@ public class SearchService extends Service {
                 for (int i = 0; i < files.length; i++) {
                     counter++;
                     if (counter % 500 == 0) {
-                        createNotification(56, R.drawable.ic_action_view_list, "Searching files...", "More than files checked - " + counter, false);
+                        createNotification(56, R.drawable.ic_action_search, "Searching files...", "More than files checked - " + counter, false);
                     }
                     File file = files[i];
                     if (file.isDirectory() && !file.isHidden()) {
@@ -107,7 +107,7 @@ public class SearchService extends Service {
                 }
             }
         }
-        createNotification(1, R.drawable.ic_action_view_list, "Searching done!", "Files checked - " + counter, true);
+        createNotification(1, R.drawable.ic_action_search, "Searching done!", "Files checked - " + counter, true);
     }
 
     //function is deciding put file to result or not

@@ -15,7 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchResultActivity"/>
+        <activity android:name=".SearchResultActivity"
+            android:screenOrientation="portrait"/>
         <service android:name=".SearchService"/>
     </application>
 

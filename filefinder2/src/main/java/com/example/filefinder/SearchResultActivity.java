@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,7 @@ public class SearchResultActivity extends AppCompatActivity {
         for (int i = 0; i < fileSizes.length; i++) {
             Log.d(LOG_TAG, "Size - " + fileSizes[i]);
             Log.d(LOG_TAG, "Name - " + resultOfSearchPath[i]);
-            items.add(new ResultItem("File", resultOfSearchPath[i], Long.toString(fileSizes[i])));
+            items.add(new ResultItem(getFileName("Name - " + resultOfSearchPath[i]), "<b> Path - </b>" + resultOfSearchPath[i], "Size - " + Long.toString(fileSizes[i]) + " bytes"));
         }
 
         rv = (RecyclerView) findViewById(R.id.rv_result);
@@ -51,6 +52,19 @@ public class SearchResultActivity extends AppCompatActivity {
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
         initializeAdapter();
+    }
+
+    private String getFileName(String s) {
+        String res = null;
+        int len = s.length();
+        Log.d(LOG_TAG, "CHAR" + (int)s.charAt(6) );
+
+        for (int i = 0; i < s.length(); i++) {
+            if ((int) s.charAt(i) == (47)) {
+                len = i;
+            }
+        }
+        return s.substring(++len);
     }
 
     private void initializeAdapter(){
@@ -85,7 +99,6 @@ public class SearchResultActivity extends AppCompatActivity {
                 tvName = (TextView) itemView.findViewById(R.id.tv_result_file_name);
                 tvPath = (TextView) itemView.findViewById(R.id.tv_result_file_path);
                 tvSize = (TextView) itemView.findViewById(R.id.tv_result_file_size);
-
             }
 
         }
@@ -110,7 +123,7 @@ public class SearchResultActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
             holder.tvName.setText(resultItems.get(position).name);
-            holder.tvPath.setText(resultItems.get(position).filePath);
+            holder.tvPath.setText(Html.fromHtml(resultItems.get(position).filePath));
             holder.tvSize.setText(resultItems.get(position).fileSize);
         }
 
